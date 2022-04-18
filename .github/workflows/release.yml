@@ -1,0 +1,30 @@
+name: release
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Poetry
+        run: |
+          pip3 install -U git+https://github.com/dclong/xinstall@main
+          xinstall pt -ic
+      - name: Build Package
+        run: |
+          ~/.local/bin/poetry build
+          ls -lha dist/
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: false
+          files: |
+            dist/dsutil-*
+  

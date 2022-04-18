@@ -1,0 +1,30 @@
+name: pre-release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  pre-release:
+    name: Pre Release
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install Poetry
+        run: |
+          pip3 install -U git+https://github.com/dclong/xinstall@main
+          xinstall pt -ic
+      - name: Build Package
+        run: |
+          ~/.local/bin/poetry build
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: next
+          prerelease: true
+          title: "Development Build"
+          files: |
+            dist/*

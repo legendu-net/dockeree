@@ -1,0 +1,42 @@
+name: Lint Code
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev ]
+
+jobs:
+  lint_code:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.7]
+    steps:
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip3 install -U git+https://github.com/dclong/xinstall@main
+        xinstall --sudo pt -ic
+        ~/.local/bin/poetry env use python3
+        cat pyproject.toml
+        ~/.local/bin/poetry install -E all
+    - name: Lint with pylint
+      run: |
+        ~/.local/bin/poetry run pylint -E dsutil/
+    - name: Lint with pytype
+      run: |
+        ~/.local/bin/poetry run pytype dsutil/ tests/
+    - name: Check code format
+      run: |
+        ~/.local/bin/poetry run yapf -dr dsutil/ tests/
