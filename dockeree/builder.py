@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Optional, Union, Callable
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -17,7 +17,21 @@ import docker
 import networkx as nx
 import git
 import pytest
-from ..utils import retry
+
+
+def retry(task: Callable, times: int = 3, wait_seconds: float = 60):
+    """Retry a Docker API on failure (for a few times).
+    :param task: The task to run.
+    :param times: The total number of times to retry.
+    :param wait_seconds: The number of seconds to wait before retrying.
+    :return: The return result of the task.
+    """
+    for _ in range(1, times):
+        try:
+            return task()
+        except:
+            time.sleep(wait_seconds)
+    return task()
 
 
 def tag_date(tag: str) -> str:
