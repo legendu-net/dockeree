@@ -32,10 +32,10 @@ jobs:
         ~/.local/bin/poetry install
     - name: Lint with pylint
       run: |
-        ~/.local/bin/poetry run pylint -E dockeree/
+        ~/.local/bin/poetry run pylint -E ./
     - name: Lint with pytype
       run: |
-        ~/.local/bin/poetry run pytype dockeree/ tests/
+        ~/.local/bin/poetry run pytype ./
     - name: Check code format
       run: |
-        ~/.local/bin/poetry run yapf -dr dockeree/ tests/
+        ~/.local/bin/poetry run yapf -dr ./
