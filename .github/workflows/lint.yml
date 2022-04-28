@@ -26,17 +26,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall --sudo pt -ic
+        pip3 install -U xinstall && xinstall --sudo pt -ic
         ~/.local/bin/poetry env use python3
-        cat pyproject.toml
-        ~/.local/bin/poetry install -E all
+        ~/.local/bin/poetry install
     - name: Lint with pylint
       run: |
-        ~/.local/bin/poetry run pylint -E dsutil/
+        ~/.local/bin/poetry run pylint -E dockeree/ tests/
     - name: Lint with pytype
       run: |
-        ~/.local/bin/poetry run pytype dsutil/ tests/
+        ~/.local/bin/poetry run pytype ./
     - name: Check code format
       run: |
-        ~/.local/bin/poetry run yapf -dr dsutil/ tests/
+        ~/.local/bin/poetry run yapf -dr ./

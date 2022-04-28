@@ -27,10 +27,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall pt -ic
+        pip3 install -U xinstall && xinstall pt -ic
         ~/.local/bin/poetry env use python3
-        ~/.local/bin/poetry install -E all
+        ~/.local/bin/poetry install
     - name: Test with pytest
       run: |
         ~/.local/bin/poetry run pytest

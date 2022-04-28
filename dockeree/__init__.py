@@ -22,7 +22,7 @@ def _get_image_repo(image):
 
 def images() -> pd.DataFrame:
     """Get information of Docker images.
-    
+
     :return: A pandas DataFrame with columns: repository, tag, image_id, created and size.
     """
     data = []
