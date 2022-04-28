@@ -15,7 +15,7 @@ from loguru import logger
 import pandas as pd
 import docker
 import networkx as nx
-import git
+import pygit2
 import pytest
 
 
@@ -168,7 +168,7 @@ class DockerImage:
             return
         if self._git_url in self._repo_path:
             self._path = self._repo_path[self._git_url]
-            repo = git.Repo(self._path)
+            repo = pygit2.Repository(self._path)
             logger.info(
                 "{} has already been cloned into {} previously.", self._git_url,
                 self._path
@@ -176,14 +176,15 @@ class DockerImage:
         else:
             self._path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self._git_url, self._path)
-            repo = git.Repo.clone_from(self._git_url, self._path)
+            repo = pygit2.clone_repository(self._git_url, self._path)
             self._repo_path[self._git_url] = self._path
         # checkout or create self._branch (from self._branch_fallback)
+        if repo.status():
+            repo.stash(repo.default_signature)
         try:
-            repo.git.checkout(self._branch, force=True)
-        except git.GitCommandError:
-            repo.git.checkout(self._branch_fallback, force=True)
-            repo.git.checkout(b=self._branch, force=True)
+            repo.checkout(f"refs/remotes/origin/{self._branch}")
+        except pygit2.InvalidSpecError:  # pylint: disable=E1101
+            repo.checkout(f"refs/remotes/origin/{self._branch_fallback}")
         self._parse_dockerfile()
 
     def _parse_dockerfile(self):

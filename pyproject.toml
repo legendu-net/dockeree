@@ -12,6 +12,7 @@ docker = ">=4.4.0"
 requests = ">=2.20.0"
 loguru = ">=0.6.0"
 PyYAML = ">=6.0"
+pygit2 = ">=1.9.1"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
