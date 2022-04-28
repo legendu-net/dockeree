@@ -28,14 +28,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall pt -ic --python python
+        pip3 install -U xinstall && xinstall pt -ic --python python
         $env:Path += ";$env:Userprofile\.local\bin"
         $env:Path += ";$env:Userprofile\AppData\Roaming\Python\Scripts"
         poetry env use python
-        poetry install --no-dev -E all
-        #poetry run pip3 install .
-        #poetry run pip3 install docker yapf
+        poetry install --no-dev
         #poetry run pip3 install pytest
     - name: Test with pytest
       run: |

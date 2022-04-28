@@ -26,11 +26,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
+        pip3 install -U xinstall
         xinstall --sudo docker -ic --user-to-docker ""
         xinstall pt -ic
         ~/.local/bin/poetry env use python3
-        ~/.local/bin/poetry install -E all
+        ~/.local/bin/poetry install
         brew install libmagic
         brew link libmagic
     - name: Test with pytest
