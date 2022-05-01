@@ -185,8 +185,7 @@ class DockerImage:
         """Checkout the branch self._branch from repo if the branch exists.
             Otherwise, create a new branch named self._branch in repo and checkout it.
         """
-        if repo.status():
-            repo.stash(repo.default_signature)
+        repo.reset(repo.head.peel().oid, pygit2.GIT_RESET_HARD)  # pylint: disable=E1101
         if repo.branches.get(self._branch) is None:
             for ref in [
                 f"refs/remotes/origin/{self._branch}",
