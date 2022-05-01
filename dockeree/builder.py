@@ -178,14 +178,26 @@ class DockerImage:
             logger.info("Cloning {} into {}", self._git_url, self._path)
             repo = pygit2.clone_repository(self._git_url, self._path)
             self._repo_path[self._git_url] = self._path
-        # checkout or create self._branch (from self._branch_fallback)
+        self._checkout_branch(repo)
+        self._parse_dockerfile()
+
+    def _checkout_branch(self, repo) -> None:
+        """Checkout the branch self._branch from repo if the branch exists.
+            Otherwise, create a new branch named self._branch in repo and checkout it.
+        """
         if repo.status():
             repo.stash(repo.default_signature)
-        try:
-            repo.checkout(f"refs/remotes/origin/{self._branch}")
-        except pygit2.InvalidSpecError:  # pylint: disable=E1101
-            repo.checkout(f"refs/remotes/origin/{self._branch_fallback}")
-        self._parse_dockerfile()
+        if repo.branches.get(self._branch) is None:
+            for ref in [
+                f"refs/remotes/origin/{self._branch}",
+                f"refs/heads/{self._branch_fallback}",
+                f"refs/remotes/origin/{self._branch_fallback}",
+            ]:
+                ref = repo.references.get(ref)
+                if ref:
+                    repo.create_branch(self._branch, ref.peel())
+                    break
+        repo.checkout(f"refs/heads/{self._branch}")
 
     def _parse_dockerfile(self):
         dockerfile = self._path / DockerImage.DOCKERFILE
