@@ -482,9 +482,13 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        cmd = f"git -C {path} diff {b1}..{b2} -- ':(exclude)test' ':(exclude)tests'"
-        diff = sp.run(cmd, shell=True, check=True, capture_output=True).stdout
-        return not diff
+        repo = pygit2.Repository(path)
+        diff = repo.diff(f"refs/heads/{b1}", f"refs/heads/{b2}")
+        return not any(
+            True for delta in diff.deltas
+            if not Path(delta.old_file.path).parts[0] in ("test", "tests") and
+            not Path(delta.new_file.path).parts[0] in ("test", "tests")
+        )
 
     def _add_root_node(self, node) -> Node:
         logger.debug("Adding root node {} into the graph ...", node)
