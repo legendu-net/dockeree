@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
+[tool.poetry.scripts]
+ldc = "dockeree:launcher.main"
+
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.11"
 pandas = ">=1.2.0"
