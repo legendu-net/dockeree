@@ -1,5 +1,8 @@
+"""This module makes it easy to launch Docker containers.
+"""
 import os
 import sys
+import getpass
 from pathlib import Path
 import subprocess as sp
 from argparse import Namespace, ArgumentParser
@@ -7,29 +10,48 @@ from loguru import logger
 
 
 def _get_port(image_name):
-    if not image_name.startswith("dclong/"):
-        return None
-    image_name = image_name[7:]
-    if image_name.startswith("jupyterlab"):
-        return 8888
-    if image_name.startswith("jupyterhub"):
-        return 8000
-    if image_name.startswith("vscode"):
-        return 8080
+    if image_name.startswith("dclong/"):
+        image_name = image_name[7:]
+        if image_name.startswith("jupyterlab"):
+            return 8888
+        if image_name.startswith("jupyterhub"):
+            return 8000
+        if image_name.startswith("vscode"):
+            return 8080
+    return None
 
 
 def launch(args):
+    """Launch a Docker container using the specified arguments.
+
+    :param args: A Namespace object.
+    """
+    USER = getpass.getuser()
+    USER_ID = os.getuid()
+    GROUP_ID = os.getgid()
     cmd = [
-        "docker", "run", "-d", "--init",
-        "--log-opt", "max-size=50m",
-        "-e", "DOCKER_USER=$(id -un)",
-        "-e", "DOCKER_USER_ID=$(id -u)",
-        "-e", "DOCKER_PASSWORD=$(id -un)",
-        "-e", "DOCKER_GROUP_ID=$(id -g)",
-        "-e", "DOCKER_ADMIN_USER=$(id -un)",
-        "-v", f"{os.getcwd()}:/workdir",
-        "-v", f"{Path.home().parent}:/home_host",
-        "--hostname", args.image_name[args.image_name.find("/") + 1 : args.image_name.find(":")],
+        "docker",
+        "run",
+        "-d",
+        "--init",
+        "--log-opt",
+        "max-size=50m",
+        "-e",
+        f"DOCKER_USER={USER}",
+        "-e",
+        f"DOCKER_USER_ID={USER_ID}",
+        "-e",
+        f"DOCKER_PASSWORD={USER}",
+        "-e",
+        f"DOCKER_GROUP_ID={GROUP_ID}",
+        "-e",
+        f"DOCKER_ADMIN_USER={USER}",
+        "-v",
+        f"{os.getcwd()}:/workdir",
+        "-v",
+        f"{Path.home().parent}:/home_host",
+        "--hostname",
+        args.image_name[args.image_name.find("/") + 1:args.image_name.find(":")],
     ]
     if sys.platform == "linux":
         memory = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
@@ -39,15 +61,16 @@ def launch(args):
         cmd.append(f"--cpus={cpus}")
     port = _get_port(args.image_name)
     if port:
-        cmd.append(f"-p {args.port if args.port else port}:{port}")
+        cmd.append(f"--publish={args.port if args.port else port}:{port}")
     if args.extra_port_mappings:
         cmd.extend("-p " + mapping for mapping in args.extra_port_mappings)
     cmd.append(args.image_name)
     if args.image_name.startswith("dclong/"):
         cmd.append("/scripts/sys/init.sh")
-    cmd = " ".join(cmd)
-    logger.debug("Launching Docker container using the following command:\n{}", cmd)
-    sp.run(cmd, shell=True)
+    logger.debug(
+        "Launching Docker container using the following command:\n{}", " ".join(cmd)
+    )
+    sp.run(cmd, check=True)
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
@@ -58,21 +81,20 @@ def parse_args(args=None, namespace=None) -> Namespace:
     :param namespace: An inital Namespace object.
     :return: A namespace object containing parsed options.
     """
-    parser = ArgumentParser(
-        description="Launch Docker containers quickly."
-    )
+    parser = ArgumentParser(description="Launch Docker containers quickly.")
     parser.add_argument(
-        "image_name", 
-        help="The name (including tag) of the Docker image to launch."
+        "image_name", help="The name (including tag) of the Docker image to launch."
     )
     parser.add_argument(
         "-p",
         "--port",
         dest="port",
         required=True,
-        help="The port on the host machine (to map to the port inside the container)."
+        help=
+        "The port on the Docker host (to which the port inside the Docker container maps)."
     )
     parser.add_argument(
+        "--extra-publish",
         "--extra-port-mappings",
         dest="extra_port_mappings",
         nargs="*",
