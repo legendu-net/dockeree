@@ -89,7 +89,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "-p",
         "--port",
         dest="port",
-        required=True,
+        required=False,
         help=
         "The port on the Docker host (to which the port inside the Docker container maps)."
     )
