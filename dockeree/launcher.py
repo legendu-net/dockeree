@@ -21,6 +21,14 @@ def _get_port(image_name):
     return None
 
 
+def _get_hostname(image_name: str):
+    start = image_name.find("/") + 1
+    end = image_name.find(":")
+    if end < 0:
+        end = len(image_name)
+    return image_name[start:end]
+
+
 def launch(args):
     """Launch a Docker container using the specified arguments.
 
@@ -51,7 +59,7 @@ def launch(args):
         "-v",
         f"{Path.home().parent}:/home_host",
         "--hostname",
-        args.image_name[args.image_name.find("/") + 1:args.image_name.find(":")],
+        _get_hostname(args.image_name),
     ]
     if sys.platform == "linux":
         memory = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
