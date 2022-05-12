@@ -1,8 +1,7 @@
 name: release
 on:
   push:
-    tags:
-      - v*
+    tags: ["v*"]
 jobs:
   release:
     name: Release
@@ -20,9 +19,9 @@ jobs:
       - name: Install Poetry
         run: |
           pip3 install -U xinstall && xinstall pt -ic
-      - name: Build Package
+      - name: Build and Pubblish Package to PyPI
         run: |
-          ~/.local/bin/poetry build
+          ~/.local/bin/poetry publish --build -u __token__ -p ${{ secrets.PYPI_DOCKEREE }}
           ls -lha dist/
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -30,7 +29,3 @@ jobs:
           prerelease: false
           files: |
             dist/*
-      - name: Publish to PyPI
-        run: |
-          pip3 install -U twine
-          twine upload --verbose dist/* -u __token__ -p ${{ secrets.PYPI_DOCKEREE }}
