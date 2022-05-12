@@ -3,6 +3,10 @@ name = "dockeree"
 version = "0.2.2"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
+license = "MIT"
+readme = "readme.md"
+repository = "https://github.com/legendu-net/dockeree"
+keywords = ["Docker", "container", "build", "management"]
 
 [tool.poetry.scripts]
 ldc = "dockeree:launcher.main"
