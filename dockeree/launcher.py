@@ -72,8 +72,8 @@ def launch(args):
         cmd.append(f"--publish={args.port if args.port else port}:{port}")
     if args.extra_port_mappings:
         cmd.extend("-p " + mapping for mapping in args.extra_port_mappings)
-    cmd.append(args.image_name)
-    if args.image_name.startswith("dclong/"):
+    cmd.extend(args.image_name)
+    if len(args.image_name) == 1 and args.image_name[0].startswith("dclong/"):
         cmd.append("/scripts/sys/init.sh")
     logger.debug(
         "Launching Docker container using the following command:\n{}", " ".join(cmd)
@@ -91,7 +91,9 @@ def parse_args(args=None, namespace=None) -> Namespace:
     """
     parser = ArgumentParser(description="Launch Docker containers quickly.")
     parser.add_argument(
-        "image_name", help="The name (including tag) of the Docker image to launch."
+        "image_name",
+        nargs="+",
+        help="The name (including tag) of the Docker image to launch."
     )
     parser.add_argument(
         "-p",
