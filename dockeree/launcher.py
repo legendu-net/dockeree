@@ -59,7 +59,7 @@ def launch(args):
         "-v",
         f"{Path.home().parent}:/home_host",
         "--hostname",
-        _get_hostname(args.image_name),
+        _get_hostname(args.image_name[0]),
     ]
     if sys.platform == "linux":
         memory = os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES")
