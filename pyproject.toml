@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dockeree"
-version = "0.2.2"
+version = "0.3.0"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
