@@ -67,7 +67,7 @@ def launch(args):
         cmd.append(f"--memory={memory}b")
         cpus = max(os.cpu_count() - 1, 1)
         cmd.append(f"--cpus={cpus}")
-    port = _get_port(args.image_name)
+    port = _get_port(args.image_name[0])
     if port:
         cmd.append(f"--publish={args.port if args.port else port}:{port}")
     if args.extra_port_mappings:
