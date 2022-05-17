@@ -40,7 +40,7 @@ def launch(args):
     cmd = [
         "docker",
         "run",
-        "-d",
+        "-d" if args.detach else "-it",
         "--init",
         "--log-opt",
         "max-size=50m",
@@ -94,6 +94,14 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "image_name",
         nargs="+",
         help="The name (including tag) of the Docker image to launch."
+    )
+    parser.add_argument(
+        "-d",
+        "--detach",
+        dest="detach",
+        required=False,
+        action="store_true",
+        help="Run container in background and print container ID."
     )
     parser.add_argument(
         "-p",
