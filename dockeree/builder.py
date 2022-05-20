@@ -285,23 +285,24 @@ class DockerImage:
         self._copy_ssh(copy_ssh_to)
         tags = _reg_tag(tags, self._branch)
         tag0 = tags[0]
-        logger.info("Building the Docker image {}:{} ...", self._name, tag0)
+        image_tag = f"{self._name}:{tag0}"
+        logger.info("Building the Docker image {} ...", image_tag)
         self._update_base_tag(tag0)
         try:
             if builder == "docker":
                 for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
                                            ).build(
                                                path=str(self._path),
-                                               tag=f"{self._name}:{tag0}",
+                                               tag=image_tag,
                                                rm=True,
                                                pull=self.is_root(),
                                                cache_from=None,
                                                decode=True
                                            ):
                     if "stream" in msg:
-                        print(msg["stream"], end="")
+                        print(f"[{image_tag}] {msg['stream']}", end="")
                 # add additional tags for the image
-                image = docker.from_env().images.get(f"{self._name}:{tag0}")
+                image = docker.from_env().images.get(image_tag)
                 for tag in tags[1:]:
                     image.tag(self._name, tag, force=True)
             elif builder == "/kaniko/executor":
