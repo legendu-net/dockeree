@@ -288,6 +288,11 @@ class DockerImage:
         image_tag = f"{self._name}:{tag0}"
         logger.info("Building the Docker image {} ...", image_tag)
         self._update_base_tag(tag0)
+        images = docker.from_env().images
+        try:
+            images.remove(image_tag, force=True)
+        except:
+            pass
         try:
             if builder == "docker":
                 for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
@@ -302,7 +307,7 @@ class DockerImage:
                     if "stream" in msg:
                         print(f"[{image_tag}] {msg['stream']}", end="")
                 # add additional tags for the image
-                image = docker.from_env().images.get(image_tag)
+                image = images.get(image_tag)
                 for tag in tags[1:]:
                     image.tag(self._name, tag, force=True)
             elif builder == "/kaniko/executor":
