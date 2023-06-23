@@ -4,7 +4,7 @@ version = "0.5.0"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "GPLv2"
-readme = "readme.md"
+readme = "README.md"
 repository = "https://github.com/legendu-net/dockeree"
 keywords = ["Docker", "container", "build", "management"]
 
