@@ -39,7 +39,7 @@ def images() -> pd.DataFrame:
                         "tag": tag.split(":")[1],
                         "image_id": image_id,
                         "created": created,
-                        "size": size
+                        "size": size,
                     }
                 )
         else:
@@ -49,7 +49,7 @@ def images() -> pd.DataFrame:
                     "tag": "<none>",
                     "image_id": image_id,
                     "created": created,
-                    "size": size
+                    "size": size,
                 }
             )
     frame = pd.DataFrame(data)
@@ -58,8 +58,7 @@ def images() -> pd.DataFrame:
 
 
 def containers() -> pd.DataFrame:
-    """Return Docker containers as a pandas DataFrame.
-    """
+    """Return Docker containers as a pandas DataFrame."""
     data = [
         (
             cont.short_id,
@@ -70,18 +69,24 @@ def containers() -> pd.DataFrame:
             cont.status,
             cont.ports,
             cont.name,
-        ) for cont in docker.from_env().containers.list(all=True)
+        )
+        for cont in docker.from_env().containers.list(all=True)
     ]
     columns = [
-        "container_id", "container_obj", "image", "command", "created", "status",
-        "ports", "name"
+        "container_id",
+        "container_obj",
+        "image",
+        "command",
+        "created",
+        "status",
+        "ports",
+        "name",
     ]
     return pd.DataFrame(data, columns=columns)
 
 
 def remove(aggressive: bool = False, choice: str = "") -> None:
-    """Remove exited Docker containers and images without tags.
-    """
+    """Remove exited Docker containers and images without tags."""
     docker.from_env().containers.prune()
     failures = remove_images(tag="none", aggressive=aggressive, choice=choice)
     if failures:
@@ -91,8 +96,7 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
 
 
 def pull():
-    """Automatically pull all valid images.
-    """
+    """Automatically pull all valid images."""
     client = docker.from_env()
     imgs = images()
     imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
@@ -106,7 +110,7 @@ def remove_images(
     tag: str = "",
     aggressive: bool = False,
     frame: Union[pd.DataFrame, None] = None,
-    choice: str = ""
+    choice: str = "",
 ) -> list[str]:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
@@ -127,9 +131,14 @@ def remove_images(
     if aggressive:
         frames.append(imgs[imgs.tag.str.contains(r"[a-z]*_?\d{4,}", case=False)])
         frames.append(
-            imgs[~imgs.tag.str.contains(r"\d{4,}")].groupby("image_id").apply(  # pylint: disable=E1101
-            lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
-        ))
+            imgs[~imgs.tag.str.contains(r"\d{4,}")]
+            .groupby("image_id")
+            .apply(  # pylint: disable=E1101
+                lambda frame: frame.query("tag == 'next'")
+                if frame.shape[0] > 1
+                else None
+            )
+        )
     return _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
 
 
