@@ -55,16 +55,19 @@ def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
     time_begin = time.perf_counter_ns()
     try:
         retry(
-            lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True),
-            times=3
+            lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3
         )
         return DockerActionResult(
-            True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9
+            True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1e9
         )
     except Exception as err:
         return DockerActionResult(
-            False, str(err), repo, tag, "push",
-            (time.perf_counter_ns() - time_begin) / 1E9
+            False,
+            str(err),
+            repo,
+            tag,
+            "push",
+            (time.perf_counter_ns() - time_begin) / 1e9,
         )
 
 
@@ -108,8 +111,8 @@ def _get_docker_builder() -> str:
 
 @dataclass(frozen=True)
 class Node:
-    """A class similar to DockerImage for simplifying code.
-    """
+    """A class similar to DockerImage for simplifying code."""
+
     git_url: str
     branch: str
 
@@ -120,7 +123,7 @@ class Node:
         if index < 0:
             # SSH urls, e.g., git@github.com:dclong/docker-jupyterhub-ds
             index = self.git_url.rindex(":", 0, rindex)
-        return self.git_url[(index + 1):] + f"<{self.branch}>"
+        return self.git_url[(index + 1) :] + f"<{self.branch}>"
 
 
 DockerActionResult = namedtuple(
@@ -129,8 +132,8 @@ DockerActionResult = namedtuple(
 
 
 class DockerImage:
-    """Class representing a Docker Image.
-    """
+    """Class representing a Docker Image."""
+
     DOCKERFILE = "Dockerfile"
 
     def __init__(
@@ -138,7 +141,7 @@ class DockerImage:
         git_url: str,
         branch: str = "dev",
         branch_fallback: str = "dev",
-        repo_path: Optional[dict[str, str]] = None
+        repo_path: Optional[dict[str, str]] = None,
     ):
         """Initialize a DockerImage object.
 
@@ -155,8 +158,7 @@ class DockerImage:
         self._git_url_base = ""
 
     def is_root(self) -> bool:
-        """Check whether this DockerImage is a root DockerImage.
-        """
+        """Check whether this DockerImage is a root DockerImage."""
         return not self._git_url_base
 
     def clone_repo(self) -> None:
@@ -170,8 +172,9 @@ class DockerImage:
             self._path = self._repo_path[self._git_url]
             repo = pygit2.Repository(self._path)
             logger.info(
-                "{} has already been cloned into {} previously.", self._git_url,
-                self._path
+                "{} has already been cloned into {} previously.",
+                self._git_url,
+                self._path,
             )
         else:
             self._path = Path(tempfile.mkdtemp())
@@ -183,7 +186,7 @@ class DockerImage:
 
     def _checkout_branch(self, repo) -> None:
         """Checkout the branch self._branch from repo if the branch exists.
-            Otherwise, create a new branch named self._branch in repo and checkout it.
+        Otherwise, create a new branch named self._branch in repo and checkout it.
         """
         repo.reset(repo.head.peel().oid, pygit2.GIT_RESET_HARD)  # pylint: disable=E1101
         if repo.branches.get(self._branch) is None:
@@ -228,7 +231,10 @@ class DockerImage:
         self.clone_repo()
         deps = deque([self])
         obj = self
-        while (obj._git_url_base, obj._branch) not in repo_branch:  # pylint: disable=W0212
+        while (
+            obj._git_url_base,
+            obj._branch,
+        ) not in repo_branch:  # pylint: disable=W0212
             if not obj._git_url_base:  # pylint: disable=W0212
                 break
             obj = obj.base_image()
@@ -236,13 +242,12 @@ class DockerImage:
         return deps
 
     def base_image(self) -> DockerImage:
-        """Get the base DockerImage of this DockerImage.
-        """
+        """Get the base DockerImage of this DockerImage."""
         image = DockerImage(
             git_url=self._git_url_base,
             branch=self._branch,
             branch_fallback=self._branch_fallback,
-            repo_path=self._repo_path
+            repo_path=self._repo_path,
         )
         image.clone_repo()
         return image
@@ -276,7 +281,7 @@ class DockerImage:
             If an empty string is specifed for tags,
             it is also treated as the latest tag.
         :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
-            under the current local Git repository. 
+            under the current local Git repository.
         :param builder: The tool to use to build Docker images.
         :return: A tuple of the format (image_name_built, tag_built, time_taken, "build").
         """
@@ -295,15 +300,16 @@ class DockerImage:
             pass
         try:
             if builder == "docker":
-                for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
-                                           ).build(
-                                               path=str(self._path),
-                                               tag=image_tag,
-                                               rm=True,
-                                               pull=self.is_root(),
-                                               cache_from=None,
-                                               decode=True
-                                           ):
+                for msg in docker.APIClient(
+                    base_url="unix://var/run/docker.sock"
+                ).build(
+                    path=str(self._path),
+                    tag=image_tag,
+                    rm=True,
+                    pull=self.is_root(),
+                    cache_from=None,
+                    decode=True,
+                ):
                     if "stream" in msg:
                         print(f"[{image_tag}] {msg['stream']}", end="")
                 # add additional tags for the image
@@ -329,7 +335,7 @@ class DockerImage:
                 image=self._name,
                 tag="",
                 action="build",
-                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+                seconds=(time.perf_counter_ns() - time_begin) / 1e9,
             )
         except docker.errors.ImageNotFound:
             return DockerActionResult(
@@ -338,7 +344,7 @@ class DockerImage:
                 image=self._name,
                 tag="",
                 action="build",
-                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+                seconds=(time.perf_counter_ns() - time_begin) / 1e9,
             )
         finally:
             self._remove_ssh(copy_ssh_to)
@@ -349,7 +355,7 @@ class DockerImage:
                 image=self._name,
                 tag=tag0,
                 action="build",
-                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+                seconds=(time.perf_counter_ns() - time_begin) / 1e9,
             )
         return DockerActionResult(
             succeed=False,
@@ -357,7 +363,7 @@ class DockerImage:
             image=self._name,
             tag=tag0,
             action="build",
-            seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+            seconds=(time.perf_counter_ns() - time_begin) / 1e9,
         )
 
     def _test_built_image(self) -> bool:
@@ -379,22 +385,20 @@ class DockerImage:
             lines = fin.readlines()
         for idx, line in enumerate(lines):
             if line.startswith("FROM "):
-                lines[idx] = line[:line.rfind(":")] + f":{tag_build}\n"
+                lines[idx] = line[: line.rfind(":")] + f":{tag_build}\n"
                 break
         with dockerfile.open("w") as fout:
             fout.writelines(lines)
 
     def node(self):
-        """Convert this DockerImage to a Node.
-        """
+        """Convert this DockerImage to a Node."""
         return Node(
             git_url=self._git_url,
             branch=self._branch,
         )
 
     def base_node(self):
-        """Convert the base image of this DockerImage to a Node.
-        """
+        """Convert the base image of this DockerImage to a Node."""
         return self.base_image().node()
 
     def docker_servers(self) -> set[str]:
@@ -415,8 +419,8 @@ class DockerImageBuilderError(Exception):
 
 
 class DockerImageBuilder:
-    """A class for build many Docker images at once.
-    """
+    """A class for build many Docker images at once."""
+
     def __init__(
         self,
         branch_urls: Union[dict[str, list[str]], str, Path],
@@ -446,7 +450,7 @@ class DockerImageBuilder:
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
-                repo_path=self._repo_path
+                repo_path=self._repo_path,
             ).get_deps(self._graph.nodes)
             self._record_docker_servers(deps)
             dep0 = deps.popleft()
@@ -463,7 +467,7 @@ class DockerImageBuilder:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
-        :param node: A dependency of the type DockerImage. 
+        :param node: A dependency of the type DockerImage.
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
         nodes: list[Node] = self._repo_nodes.get(node.git_url, [])
@@ -491,9 +495,10 @@ class DockerImageBuilder:
         repo = pygit2.Repository(path)
         diff = repo.diff(f"refs/heads/{b1}", f"refs/heads/{b2}")
         return not any(
-            True for delta in diff.deltas
-            if not Path(delta.old_file.path).parts[0] in ("test", "tests") and
-            not Path(delta.new_file.path).parts[0] in ("test", "tests")
+            True
+            for delta in diff.deltas
+            if not Path(delta.old_file.path).parts[0] in ("test", "tests")
+            and not Path(delta.new_file.path).parts[0] in ("test", "tests")
         )
 
     def _add_root_node(self, node) -> Node:
@@ -548,8 +553,7 @@ class DockerImageBuilder:
             self._build_graph_branch(branch, urls)
 
     def save_graph(self, output="graph.yaml") -> None:
-        """Save the underlying graph structure to files.
-        """
+        """Save the underlying graph structure to files."""
         with open(output, "w", encoding="utf-8") as fout:
             # nodes and attributes
             fout.write("nodes:\n")
@@ -581,7 +585,7 @@ class DockerImageBuilder:
 
         :param tag_build: The tag of built images.
         :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
-            under each of the local Git repositories. 
+            under each of the local Git repositories.
         :param push: If True, push the built Docker images to DockerHub.
         :return: A pandas DataFrame summarizing building information.
         """
@@ -600,9 +604,12 @@ class DockerImageBuilder:
             raise DockerImageBuilderError(self._build_error_msg())
 
     def _build_error_msg(self):
-        return "Failed to build Docker images corresponding to the following nodes:\n" + "\n".join(
-            f"{node} {list(self._get_identical_branches(node))}:\n{self._graph.nodes[node]['build_err_msg']}"
-            for node in self.failures
+        return (
+            "Failed to build Docker images corresponding to the following nodes:\n"
+            + "\n".join(
+                f"{node} {list(self._get_identical_branches(node))}:\n{self._graph.nodes[node]['build_err_msg']}"
+                for node in self.failures
+            )
         )
 
     def _build_images_graph(
@@ -654,7 +661,7 @@ class DockerImageBuilder:
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
-            repo_path=self._repo_path
+            repo_path=self._repo_path,
         ).build(tags=tags, copy_ssh_to=copy_ssh_to, builder=self._builder)
         attr = self._graph.nodes[node]
         attr["build_succeed"] = succeed
@@ -664,8 +671,8 @@ class DockerImageBuilder:
             for tag in tags:
                 _push_image_timing(name, tag)
 
-    #@staticmethod
-    #def _push_images(name, action_time):
+    # @staticmethod
+    # def _push_images(name, action_time):
     #    for idx in range(len(action_time)):
     #        tag, *_ = action_time[idx]
     #        _, *tas = _push_image_timing(name, tag)
