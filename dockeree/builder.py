@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Optional, Union, Callable
+from typing import Callable
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -89,7 +89,7 @@ def branch_to_tag(branch: str) -> str:
     return branch
 
 
-def _reg_tag(tag: Union[None, str, list[str]], branch: str):
+def _reg_tag(tag: None | str | list[str], branch: str):
     if tag is None:
         tag = branch_to_tag(branch)
     elif tag == "":
@@ -141,7 +141,7 @@ class DockerImage:
         git_url: str,
         branch: str = "dev",
         branch_fallback: str = "dev",
-        repo_path: Optional[dict[str, str]] = None,
+        repo_path: dict[str, str] | None = None,
     ):
         """Initialize a DockerImage object.
 
@@ -162,10 +162,7 @@ class DockerImage:
         return not self._git_url_base
 
     def clone_repo(self) -> None:
-        """Clone the Git repository to a local directory.
-
-        :param repo_branch: A dick containing mapping of git_url to its local path.
-        """
+        """Clone the Git repository to a local directory."""
         if self._path:
             return
         if self._git_url in self._repo_path:
@@ -221,21 +218,23 @@ class DockerImage:
         if not self._base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, repo_branch) -> deque[DockerImage]:
+    def get_deps(self, repo_branch, base_image_name: str = "") -> deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param repo_branch: A set-like collection containing tuples of (git_url, branch).
-        :param repo_branch: A dick containing mapping of git_url to its local path.
         :return: A deque containing dependency images.
         """
         self.clone_repo()
         deps = deque([self])
         obj = self
+        base_image_name = base_image_name.split(":")[0] + ":"
         while (
-            obj._git_url_base,
-            obj._branch,
-        ) not in repo_branch:  # pylint: disable=W0212
-            if not obj._git_url_base:  # pylint: disable=W0212
+            obj._git_url_base,  # pylint: disable=W0212
+            obj._branch,  # pylint: disable=W0212
+        ) not in repo_branch:
+            if (
+                obj._base_image.startswith(base_image_name) or not obj._git_url_base
+            ):  # pylint: disable=W0212
                 break
             obj = obj.base_image()
             deps.appendleft(obj)
@@ -268,7 +267,7 @@ class DockerImage:
 
     def build(
         self,
-        tags: Union[None, str, list[str]] = None,
+        tags: None | str | list[str] = None,
         copy_ssh_to: str = "",
         builder: str = _get_docker_builder(),
     ) -> DockerActionResult:
@@ -423,7 +422,7 @@ class DockerImageBuilder:
 
     def __init__(
         self,
-        branch_urls: Union[dict[str, list[str]], str, Path],
+        branch_urls: dict[str, dict[str, str]] | str | Path,
         branch_fallback: str = "dev",
         builder: str = _get_docker_builder(),
     ):
@@ -444,14 +443,14 @@ class DockerImageBuilder:
         for dep in deps:
             self._servers.update(dep.docker_servers())
 
-    def _build_graph_branch(self, branch, urls):
-        for url in urls:
+    def _build_graph_branch(self, branch: str, urls: dict[str, str]):
+        for url, base_image_name in urls.items():
             deps: deque[DockerImage] = DockerImage(
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path,
-            ).get_deps(self._graph.nodes)
+            ).get_deps(self._graph.nodes, base_image_name=base_image_name)
             self._record_docker_servers(deps)
             dep0 = deps.popleft()
             if dep0.is_root():
@@ -463,7 +462,7 @@ class DockerImageBuilder:
             for dep in deps:
                 node_prev = self._add_edge(node_prev, dep.node())
 
-    def _find_identical_node(self, node: Node) -> Union[Node, None]:
+    def _find_identical_node(self, node: Node) -> Node | None:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
@@ -576,7 +575,7 @@ class DockerImageBuilder:
 
     def build_images(
         self,
-        tag_build: Optional[str] = None,
+        tag_build: str | None = None,
         copy_ssh_to: str = "",
         push: bool = True,
         remove: bool = False,
