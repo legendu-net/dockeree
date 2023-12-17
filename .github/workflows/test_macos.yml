@@ -13,10 +13,9 @@ jobs:
           #- ubuntu-latest
           - macOS-latest
         python-version: 
-          - "3.8"
-          - "3.9"
           - "3.10"
           - "3.11"
+          #- "3.12"
 
     steps:
     - uses: actions/checkout@v3
@@ -26,10 +25,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U xinstall
-        xinstall --sudo docker -ic --user-to-docker ""
-        xinstall pt -ic
+        curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+        icon docker -ic --user-to-docker ""
+        icon pt -ic
         ~/.local/bin/poetry env use python3
+        ~/.local/bin/poetry run pip install --upgrade pip
         ~/.local/bin/poetry install
         brew install libmagic
         brew link libmagic

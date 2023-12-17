@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dockeree"
-version = "0.5.1"
+version = "0.6.0"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "GPLv2"
@@ -9,7 +9,7 @@ repository = "https://github.com/legendu-net/dockeree"
 keywords = ["Docker", "container", "build", "management"]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.12"
+python = ">=3.10,<3.12"
 pandas = ">=1.2.0"
 networkx = ">=2.5"
 docker = ">=6.1.0"
