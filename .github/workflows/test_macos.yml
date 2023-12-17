@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
-        icon --sudo docker -ic --user-to-docker ""
+        icon docker -ic --user-to-docker ""
         icon pt -ic
         ~/.local/bin/poetry env use python3
         ~/.local/bin/poetry install
