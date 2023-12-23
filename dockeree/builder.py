@@ -142,6 +142,7 @@ class DockerImage:
         branch: str = "dev",
         branch_fallback: str = "dev",
         repo_path: dict[str, str] | None = None,
+        root_image_name: str = "",
     ):
         """Initialize a DockerImage object.
 
@@ -155,11 +156,14 @@ class DockerImage:
         self._path = None
         self._name = ""
         self._base_image = ""
+        self._root_image_name = root_image_name.split(":")[0] + ":"
         self._git_url_base = ""
 
     def is_root(self) -> bool:
         """Check whether this DockerImage is a root DockerImage."""
-        return not self._git_url_base
+        return (
+            self._base_image.startswith(self._root_image_name) or not self._git_url_base
+        )
 
     def clone_repo(self) -> None:
         """Clone the Git repository to a local directory."""
@@ -218,7 +222,7 @@ class DockerImage:
         if not self._base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, repo_branch, base_image_name: str = "") -> deque[DockerImage]:
+    def get_deps(self, repo_branch) -> deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param repo_branch: A set-like collection containing tuples of (git_url, branch).
@@ -227,14 +231,11 @@ class DockerImage:
         self.clone_repo()
         deps = deque([self])
         obj = self
-        base_image_name = base_image_name.split(":")[0] + ":"
         while (
             obj._git_url_base,  # pylint: disable=W0212
             obj._branch,  # pylint: disable=W0212
         ) not in repo_branch:
-            if (
-                obj._base_image.startswith(base_image_name) or not obj._git_url_base
-            ):  # pylint: disable=W0212
+            if obj.is_root():
                 break
             obj = obj.base_image()
             deps.appendleft(obj)
@@ -247,6 +248,7 @@ class DockerImage:
             branch=self._branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path,
+            root_image_name=self._root_image_name,
         )
         image.clone_repo()
         return image
@@ -444,13 +446,14 @@ class DockerImageBuilder:
             self._servers.update(dep.docker_servers())
 
     def _build_graph_branch(self, branch: str, urls: dict[str, str]):
-        for url, base_image_name in urls.items():
+        for url, root_image_name in urls.items():
             deps: deque[DockerImage] = DockerImage(
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path,
-            ).get_deps(self._graph.nodes, base_image_name=base_image_name)
+                root_image_name=root_image_name,
+            ).get_deps(self._graph.nodes)
             self._record_docker_servers(deps)
             dep0 = deps.popleft()
             if dep0.is_root():
