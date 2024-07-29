@@ -54,7 +54,7 @@ def images() -> pd.DataFrame:
                 }
             )
     frame = pd.DataFrame(data)
-    frame.created = pd.to_datetime(frame.created, format="%Y-%m-%dT%H:%M:%SZ")
+    frame.created = pd.to_datetime(frame.created, format="mixed")
     return frame
 
 
