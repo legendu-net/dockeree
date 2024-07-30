@@ -1,5 +1,6 @@
 """Docker related utils.
 """
+
 from __future__ import annotations
 import sys
 from typing import Union
@@ -53,7 +54,7 @@ def images() -> pd.DataFrame:
                 }
             )
     frame = pd.DataFrame(data)
-    frame.created = pd.to_datetime(frame.created)
+    frame.created = pd.to_datetime(frame.created, format="mixed")
     return frame
 
 
@@ -134,9 +135,9 @@ def remove_images(
             imgs[~imgs.tag.str.contains(r"\d{4,}")]
             .groupby("image_id")
             .apply(  # pylint: disable=E1101
-                lambda frame: frame.query("tag == 'next'")
-                if frame.shape[0] > 1
-                else None
+                lambda frame: (
+                    frame.query("tag == 'next'") if frame.shape[0] > 1 else None
+                )
             )
         )
     return _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dockeree"
-version = "0.6.1"
+version = "0.6.2"
 description = "Make it easy to build and manager Docker images."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "GPLv2"
@@ -16,7 +16,7 @@ docker = ">=6.1.0"
 requests = ">=2.20.0"
 loguru = ">=0.6.0"
 PyYAML = ">=6.0"
-pygit2 = ">=1.9.1"
+pygit2 = ">=1.15.1"
 pytest = ">=3.0"
 
 [tool.poetry.group.dev.dependencies]

@@ -1,5 +1,6 @@
 """Test DockerImageBuilder.
 """
+
 import sys
 import shutil
 from pathlib import Path
