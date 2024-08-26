@@ -5,5 +5,5 @@ tasks:
   - command: . /scripts/gitpod.sh
 vscode:
   extensions:
-    - vscodevim.vim
+    - asvetliakov.vscode-neovim
     - ms-python.python
