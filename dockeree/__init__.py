@@ -1,5 +1,5 @@
-"""Docker related utils.
-"""
+"""Docker related utils."""
+
 from __future__ import annotations
 import sys
 from typing import Union
@@ -8,6 +8,8 @@ from loguru import logger
 import pandas as pd
 import docker
 from .builder import DockerImage, DockerImageBuilder
+
+__all__ = [DockerImage, DockerImageBuilder]
 
 
 def _get_image_repo(image):
@@ -162,7 +164,7 @@ def _remove_images_frame(imgs, choice: str = "") -> list[str]:
         if choice == "y":
             try:
                 client.images.remove(image)
-            except:
+            except Exception:
                 failures.append(image)
         elif choice == "i":
             choice_i = input(
@@ -171,7 +173,7 @@ def _remove_images_frame(imgs, choice: str = "") -> list[str]:
             if choice_i == "y":
                 try:
                     client.images.remove(image)
-                except:
+                except Exception:
                     failures.append(image)
     return failures
 

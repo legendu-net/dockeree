@@ -1,55 +1,36 @@
-[tool.poetry]
+[project]
 name = "dockeree"
 version = "0.6.1"
 description = "Make it easy to build and manager Docker images."
-authors = ["Benjamin Du <longendu@yahoo.com>"]
-license = "GPLv2"
+authors = [{ name = "Benjamin Du", email = "longendu@yahoo.com" }]
+requires-python = ">=3.10,<3.14"
 readme = "README.md"
-repository = "https://github.com/legendu-net/dockeree"
-keywords = ["Docker", "container", "build", "management"]
-
-[tool.poetry.dependencies]
-python = ">=3.10,<3.12"
-pandas = ">=1.2.0"
-networkx = ">=2.5"
-docker = ">=6.1.0"
-requests = ">=2.20.0"
-loguru = ">=0.6.0"
-PyYAML = ">=6.0"
-pygit2 = ">=1.9.1"
-pytest = ">=3.0"
-
-[tool.poetry.group.dev.dependencies]
-black = ">=23.3.0"
-pylint = ">=2.7.0"
-flake8 = ">=3.8.4"
-pytype = { version = ">=2020.08.10", python = "<3.9" }
-darglint = ">=1.5.8"
-
-[tool.yapf]
-based_on_style = "facebook"
-column_limit = 88
-
-[tool.yapfignore]
-ignore_patterns = [
-    "*/.ipynb_checkpoints/",
-    ".venv/",
-    "venv/",
+license = { text = "GPL-2.0-only" }
+keywords = [
+    "Docker",
+    "container",
+    "build",
+    "management",
+]
+dependencies = [
+    "pandas>=1.2.0",
+    "networkx>=2.5",
+    "docker>=6.1.0",
+    "requests>=2.20.0",
+    "loguru>=0.6.0",
+    "PyYAML>=6.0",
+    "pygit2>=1.9.1",
+    "pytest>=3.0",
 ]
 
-[tool.pylint.master]
-ignore = ".venv,.ipynb_checkpoints"
-unsafe-load-any-extension = "no"
-extension-pkg-whitelist = "numpy,cv2,pyspark"
-generated-members = "sqlite3.*,cv2.*,pyspark.*"
-ignored-modules = "pyspark.sql.functions"
+[project.urls]
+Repository = "https://github.com/legendu-net/dockeree"
 
-[tool.pylint.typecheck]
-ignored-classes = "Namespace"
-
-[tool.pylint.messages_control]
-disable = "C0103,C0200,C0301,C0303,R0902,R0903,R0911,R0912,R0913,W0621,W0622,W0702,W0703,W1116"
+[dependency-groups]
+dev = [
+    "ruff>=0.11.13",
+]
 
 [build-system]
-requires = ["poetry>=1.0.0"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

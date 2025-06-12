@@ -1,5 +1,5 @@
-"""Docker related utils.
-"""
+"""Docker related utils."""
+
 from __future__ import annotations
 from typing import Callable
 from dataclasses import dataclass
@@ -29,7 +29,7 @@ def retry(task: Callable, times: int = 3, wait_seconds: float = 60):
     for _ in range(1, times):
         try:
             return task()
-        except:
+        except Exception:
             time.sleep(wait_seconds)
     return task()
 
@@ -297,7 +297,7 @@ class DockerImage:
         images = docker.from_env().images
         try:
             images.remove(image_tag, force=True)
-        except:
+        except Exception:
             pass
         try:
             if builder == "docker":
@@ -499,8 +499,8 @@ class DockerImageBuilder:
         return not any(
             True
             for delta in diff.deltas
-            if not Path(delta.old_file.path).parts[0] in ("test", "tests")
-            and not Path(delta.new_file.path).parts[0] in ("test", "tests")
+            if Path(delta.old_file.path).parts[0] not in ("test", "tests")
+            and Path(delta.new_file.path).parts[0] not in ("test", "tests")
         )
 
     def _add_root_node(self, node) -> Node:
