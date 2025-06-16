@@ -28,6 +28,7 @@ Repository = "https://github.com/legendu-net/dockeree"
 
 [dependency-groups]
 dev = [
+    "pytype>=2024.10.11",
     "ruff>=0.11.13",
 ]
 

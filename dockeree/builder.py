@@ -582,7 +582,7 @@ class DockerImageBuilder:
         copy_ssh_to: str = "",
         push: bool = True,
         remove: bool = False,
-    ) -> pd.DataFrame:
+    ):
         """Build all Docker images in self.docker_images in order.
 
         :param tag_build: The tag of built images.
