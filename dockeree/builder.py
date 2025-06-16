@@ -12,7 +12,6 @@ import shutil
 import subprocess as sp
 import yaml
 from loguru import logger
-import pandas as pd
 import docker
 import networkx as nx
 import pygit2
