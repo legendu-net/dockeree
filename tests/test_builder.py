@@ -1,5 +1,4 @@
-"""Test DockerImageBuilder.
-"""
+"""Test DockerImageBuilder."""
 
 import sys
 import shutil
