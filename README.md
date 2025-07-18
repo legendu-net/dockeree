@@ -2,13 +2,6 @@
 
 Make it easy to build and manager Docker images.
     
-## Supported Operating Systems and Python Versions
-
-| OS      | Python 3.8 | Python 3.9 | Python 3.10 |
-|---------|------------|------------|-------------|
-| Linux   | Y          | Y          | Y           |
-| macOS   | Y          | Y          | Y           |
-
 ## Installation
 
 You can download a copy of the latest release and install it using pip.
