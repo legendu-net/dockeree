@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 import sys
-from typing import Union
 import subprocess as sp
 from loguru import logger
 import pandas as pd
@@ -111,7 +110,7 @@ def remove_images(
     name: str = "",
     tag: str = "",
     aggressive: bool = False,
-    frame: Union[pd.DataFrame, None] = None,
+    frame: pd.DataFrame | None = None,
     choice: str = "",
 ) -> list[str]:
     """Remove specified Docker images.
