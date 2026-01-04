@@ -16,7 +16,6 @@ dependencies = [
     "pandas>=1.2.0",
     "networkx>=2.5",
     "docker>=6.1.0",
-    "requests>=2.20.0",
     "loguru>=0.6.0",
     "PyYAML>=6.0",
     "pygit2>=1.9.1",

@@ -254,7 +254,7 @@ wheels = [
 
 [[package]]
 name = "dockeree"
-version = "0.6.4"
+version = "0.7.0"
 source = { editable = "." }
 dependencies = [
     { name = "docker" },
@@ -266,7 +266,6 @@ dependencies = [
     { name = "pygit2", version = "1.19.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "pytest" },
     { name = "pyyaml" },
-    { name = "requests" },
 ]
 
 [package.dev-dependencies]
@@ -286,7 +285,6 @@ requires-dist = [
     { name = "pygit2", specifier = ">=1.9.1" },
     { name = "pytest", specifier = ">=3.0" },
     { name = "pyyaml", specifier = ">=6.0" },
-    { name = "requests", specifier = ">=2.20.0" },
 ]
 
 [package.metadata.requires-dev]
