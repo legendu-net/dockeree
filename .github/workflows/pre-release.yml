@@ -12,17 +12,13 @@ jobs:
       pull-requests: write
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+      - uses: actions/checkout@v6
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf https://astral.sh/uv/install.sh | sudo env UV_INSTALL_DIR="/usr/local/bin" sh
       - name: Build Package
         run: |
-          ~/.local/bin/uv build
+          uv build
           ls -lha dist/
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:

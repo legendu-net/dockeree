@@ -3,7 +3,7 @@ name = "dockeree"
 version = "0.6.4"
 description = "Make it easy to build and manager Docker images."
 authors = [{ name = "Benjamin Du", email = "longendu@yahoo.com" }]
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<4"
 readme = "README.md"
 license = { text = "GPL-2.0-only" }
 keywords = [
@@ -28,6 +28,7 @@ Repository = "https://github.com/legendu-net/dockeree"
 
 [dependency-groups]
 dev = [
+    "deptry>=0.24.0",
     "pytype>=2024.10.11",
     "ruff>=0.11.13",
 ]
