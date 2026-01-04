@@ -30,4 +30,7 @@ jobs:
         curl -LsSf https://astral.sh/uv/install.sh | sudo env UV_INSTALL_DIR="/usr/local/bin" sh
         uv sync --all-extras
     - name: Test with pytest
-      run: uv run --python ${{ matrix.python-version }} pytest
+      run: |
+        docker images
+        uv run --python ${{ matrix.python-version }} pytest
+        docker images

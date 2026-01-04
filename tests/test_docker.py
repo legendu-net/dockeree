@@ -9,19 +9,19 @@ import dockeree
 BASE_DIR = Path(__file__).parent
 
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
+@pytest.mark.skipif(sys.platform in ("darwin", "win32"), reason="Only test on Linux")
 def test_images():
     if shutil.which("docker"):
         dockeree.images()
 
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
+@pytest.mark.skipif(sys.platform in ("darwin", "win32"), reason="Only test on Linux")
 def test_containers():
     if shutil.which("docker"):
         dockeree.containers()
 
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
+@pytest.mark.skipif(sys.platform in ("darwin", "win32"), reason="Only test on Linux")
 def test_remove_images():
     if shutil.which("docker"):
         dockeree.remove_images(name="nimade")
