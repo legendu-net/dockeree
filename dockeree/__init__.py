@@ -73,7 +73,7 @@ def containers() -> pd.DataFrame:
         )
         for cont in docker.from_env().containers.list(all=True)
     ]
-    columns = [
+    columns: list[str] = [
         "container_id",
         "container_obj",
         "image",
@@ -83,7 +83,7 @@ def containers() -> pd.DataFrame:
         "ports",
         "name",
     ]
-    return pd.DataFrame(data, columns=columns)
+    return pd.DataFrame(data, columns=columns)  # ty: ignore[invalid-argument-type]
 
 
 def remove(aggressive: bool = False, choice: str = "") -> None:
