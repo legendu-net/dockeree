@@ -29,9 +29,18 @@ Repository = "https://github.com/legendu-net/dockeree"
 [dependency-groups]
 dev = [
     "deptry>=0.24.0",
-    "pytype>=2024.10.11",
+    "pytest>=9.0.2",
     "ruff>=0.11.13",
+    "ty>=0.0.8",
 ]
+
+[[tool.ty.overrides]]
+include = [
+    "dockeree/builder.py",
+]
+
+[tool.ty.overrides.rules]
+possibly-missing-attribute = "ignore"
 
 [build-system]
 requires = ["hatchling"]
