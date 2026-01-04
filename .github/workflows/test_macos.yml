@@ -6,11 +6,9 @@ on:
     branches: [ dev, main ]
 jobs:
   test_code:
-    runs-on: ${{matrix.os}}
+    runs-on: macOS-latest
     strategy:
       matrix:
-        os: 
-          - macOS-latest
         python-version: 
           - "3.11"
           - "3.12"
