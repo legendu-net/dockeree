@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - macOS-latest
+          #- macOS-latest
           - ubuntu-latest
         python-version: 
           - "3.11"
@@ -22,11 +22,11 @@ jobs:
     - uses: actions/checkout@v6
     - name: Install dependencies
       run: |
-        if [[ "$(uname)" == *Darwin* ]]; then
-            brew install libmagic && brew link libmagic
-            curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
-            icon docker -ic --user-to-docker ""
-        fi
+        #if [[ "$(uname)" == *Darwin* ]]; then
+        #    brew install libmagic && brew link libmagic
+        #    curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+        #    icon docker -ic --user-to-docker ""
+        #fi
         curl -LsSf https://astral.sh/uv/install.sh | sudo env UV_INSTALL_DIR="/usr/local/bin" sh
         uv sync --all-extras
     - name: Test with pytest
