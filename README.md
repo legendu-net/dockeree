@@ -1,4 +1,5 @@
-# [dockeree](https://github.com/dclong/dockeree)
+# dockeree  |  [@GitHub](https://github.com/legendu-net/dockeree)  |  [@PyPI](https://pypi.org/project/dockeree/)
+
 
 Make it easy to build and manager Docker images.
     
