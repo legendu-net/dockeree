@@ -19,6 +19,7 @@ on:
     branches: [ dev ]
   schedule:
     - cron: '17 23 * * 4'
+      timezone: 'America/Los_Angeles'
 
 jobs:
   analyze:
